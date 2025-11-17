@@ -1,59 +1,61 @@
-// components/SignupForm.tsx
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createAccount, login } from '../appwriteconfig/authservices';
-
+import { useState } from "react";
+import { useAuthStore } from "../store/authStore";
+import { useNavigate } from "react-router-dom";
+import Input from "./UI/Input";
 
 const SignupForm = () => {
+  const { signupUser, loading, error } = useAuthStore();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await createAccount(email, password, name);
-      await login(email, password); // Auto login after signup
-      navigate('/Dashboard');
-    } catch (err: any) {
-      setError(err.message || 'Signup failed');
-    }
+    await signupUser(email, password, name);
+    navigate("/dashboard");
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto mt-10">
-      <h2 className="text-2xl font-bold">Sign Up</h2>
-      <input
-        type="text"
-        placeholder="Full Name"
-        value={name}
-        onChange={e => setName(e.target.value)}
-        className="w-full border p-2 rounded"
-        required
-      />
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-        className="w-full border p-2 rounded"
-        required
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-        className="w-full border p-2 rounded"
-        required
-      />
-      <button type="submit" className="w-full bg-green-500 text-white py-2 rounded">
-        Sign Up
-      </button>
-      {error && <p className="text-red-500">{error}</p>}
-    </form>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white shadow-md rounded-xl p-8 w-full max-w-md space-y-6"
+      >
+        <h2 className="text-2xl font-bold text-center">Sign Up</h2>
+
+        <Input
+          placeholder="Full Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <Input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <Input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition"
+          disabled={loading}
+        >
+          {loading ? "Signing Up..." : "Sign Up"}
+        </button>
+
+        {error && <p className="text-red-500 text-center">{error}</p>}
+      </form>
+    </div>
   );
 };
 
