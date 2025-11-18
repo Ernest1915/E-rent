@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/UI/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/UI/card";
-import { loginWithGoogle } from "";
+import { loginWithGoogle } from "@appwriteconfig/authservices";
 import { Loader2, LogIn } from "lucide-react";
 
 const AdminLogin = () => {
