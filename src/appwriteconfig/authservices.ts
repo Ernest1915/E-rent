@@ -1,32 +1,25 @@
-import { account } from "./config";
-export const createAccount  = async(email: string, password: string, name: string) => {
-    try {
-        const res = account.create('unique()', email, password, name);
-        return res
-    }catch (error) {
-        throw error;
-      }
-    
+import { account, oauthProvider } from "./config";
+
+export const loginWithGoogle = async () => {
+  account.createOAuth2Session(
+    oauthProvider.Google,
+    import.meta.env.VITE_OAUTH_SUCCESS_REDIRECT,
+    import.meta.env.VITE_OAUTH_FAILURE_REDIRECT
+  );
 };
-export const login = async (email: string, password: string) => {
-    try {
-      const res = await account.createSession(email, password);
-      return res;
-    } catch (error) {
-      throw error;
-    }
-  };
-  export const getCurrentUser = async () => {
-    try {
-      return await account.get();
-    } catch (error) {
-      return null;
-    }
-  };
-  export const logout = async () => {
-    try {
-      await account.deleteSession('current');
-    } catch (error) {
-      throw error;
-    }
-  };  
+
+export const getCurrentUser = async () => {
+  try {
+    return await account.get();
+  } catch {
+    return null;
+  }
+};
+
+export const logout = async () => {
+  try {
+    await account.deleteSession("current");
+  } catch (error) {
+    throw error;
+  }
+};
