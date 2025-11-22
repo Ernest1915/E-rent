@@ -8,6 +8,22 @@ export const loginWithGoogle = async () => {
   );
 };
 
+export const login = async (email: string, password: string) => {
+  try {
+    return await account.createEmailPasswordSession(email, password);
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createAccount = async (email: string, password: string, name: string) => {
+  try {
+    return await account.create("unique()", email, password, name);
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getCurrentUser = async () => {
   try {
     return await account.get();
