@@ -1,127 +1,82 @@
-import { Link } from "react-router-dom";
+import { loginWithGoogle } from "@appwriteconfig/authservices";
 import { Button } from "@/components/UI/button";
-import { Card, CardContent } from "@/components/UI/card";
-import { Building2, CheckCircle, ArrowRight, Shield, Users, Zap } from "lucide-react";
+import { Building2, Loader2 } from "lucide-react";
+import { useState } from "react";
 
 const LandingPage = () => {
+    const [loading, setLoading] = useState(false);
+
+    const handleGoogleLogin = async () => {
+        setLoading(true);
+        try {
+            await loginWithGoogle();
+        } catch (err) {
+            console.error("Google Login Failed:", err);
+            setLoading(false);
+        }
+    };
+
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-900">
-            {/* Navbar */}
-            <nav className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/80 backdrop-blur-md">
-                <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-                    <div className="flex items-center gap-2">
-                        <Building2 className="h-6 w-6 text-blue-600" />
-                        <span className="text-xl font-bold tracking-tight">E-Rent Uganda</span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <Link to="/login">
-                            <Button variant="ghost" className="text-sm font-medium">
-                                Log in
-                            </Button>
-                        </Link>
-                        <Link to="/login">
-                            <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
-                                Get Started
-                            </Button>
-                        </Link>
-                    </div>
-                </div>
-            </nav>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 flex flex-col">
+            
+            {/* Main Content */}
+            <main className="flex-1 flex items-center justify-center px-6">
+                <div className="max-w-6xl w-full grid md:grid-cols-2 gap-16 items-center">
 
-            {/* Hero Section */}
-            <section className="relative overflow-hidden pt-16 md:pt-24 lg:pt-32">
-                <div className="container mx-auto px-4 md:px-6">
-                    <div className="flex flex-col items-center text-center space-y-8">
-                        <div className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm font-medium text-blue-800">
-                            <span className="flex h-2 w-2 rounded-full bg-blue-600 mr-2"></span>
-                            The #1 Rental Management Solution in Uganda
+                    {/* LEFT SIDE */}
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-3">
+                            <Building2 className="h-10 w-10 text-indigo-600" />
+                            <h1 className="text-4xl font-extrabold text-slate-900">
+                                E-Rent Uganda
+                            </h1>
                         </div>
 
-                        <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl max-w-4xl">
-                            Manage your rentals <br className="hidden sm:inline" />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">
-                                with confidence and ease
-                            </span>
-                        </h1>
-
-                        <p className="max-w-[700px] text-lg text-gray-600 md:text-xl leading-relaxed">
-                            Streamline your property management, track payments, and manage tenants all in one place.
-                            Built specifically for the Ugandan real estate market.
-                        </p>
-
-                        <div className="flex flex-col sm:flex-row gap-4 min-w-[200px]">
-                            <Link to="/login">
-                                <Button size="lg" className="w-full sm:w-auto h-12 px-8 text-base bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200">
-                                    Start Managing Now
-                                    <ArrowRight className="ml-2 h-5 w-5" />
-                                </Button>
-                            </Link>
-                            <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 px-8 text-base border-gray-300 hover:bg-gray-50">
-                                View Demo
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Abstract Background Elements */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 w-[1000px] h-[500px] opacity-30 pointer-events-none">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 blur-[100px] rounded-full mix-blend-multiply animate-blob"></div>
-                </div>
-            </section>
-
-            {/* Features Section */}
-            <section className="py-24 bg-gray-50 mt-24">
-                <div className="container mx-auto px-4 md:px-6">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">Everything you need to run your business</h2>
-                        <p className="text-gray-600 max-w-2xl mx-auto">
-                            Powerful features designed to save you time and increase your revenue.
+                        <p className="text-xl text-slate-600 max-w-md leading-relaxed">
+                            A simple and modern way to manage your rentals —
+                            trusted, secure and built for property owners in Uganda.
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {[
-                            {
-                                icon: <Users className="h-10 w-10 text-blue-600" />,
-                                title: "Tenant Management",
-                                description: "Keep track of all your tenants, lease agreements, and contact details in one secure database."
-                            },
-                            {
-                                icon: <Zap className="h-10 w-10 text-blue-600" />,
-                                title: "Automated Billing",
-                                description: "Generate invoices automatically and track payments. Never miss a rent collection again."
-                            },
-                            {
-                                icon: <Shield className="h-10 w-10 text-blue-600" />,
-                                title: "Secure & Reliable",
-                                description: "Your data is encrypted and backed up. Access your dashboard from anywhere, anytime."
-                            }
-                        ].map((feature, index) => (
-                            <Card key={index} className="border-none shadow-md hover:shadow-lg transition-shadow duration-200">
-                                <CardContent className="p-8 flex flex-col items-center text-center space-y-4">
-                                    <div className="p-3 bg-blue-50 rounded-full">
-                                        {feature.icon}
-                                    </div>
-                                    <h3 className="text-xl font-bold">{feature.title}</h3>
-                                    <p className="text-gray-600">{feature.description}</p>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </div>
-            </section>
+                    {/* RIGHT SIDE - LOGIN CARD */}
+                    <div className="w-full max-w-sm mx-auto bg-white p-8 rounded-2xl shadow-lg border border-slate-100">
+                        <h2 className="text-xl font-semibold text-slate-800 mb-6 text-center">
+                            Sign in to continue
+                        </h2>
 
-            {/* Footer */}
-            <footer className="py-12 border-t border-gray-200 bg-white">
-                <div className="container mx-auto px-4 md:px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div className="flex items-center gap-2">
-                        <Building2 className="h-5 w-5 text-gray-500" />
-                        <span className="text-lg font-semibold text-gray-700">E-Rent Uganda</span>
+                        <Button
+                            onClick={handleGoogleLogin}
+                            disabled={loading}
+                            className="w-full h-12 flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-lg transition-all"
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                    Signing in...
+                                </>
+                            ) : (
+                                <>
+                                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                                    </svg>
+                                    Continue with Google
+                                </>
+                            )}
+                        </Button>
+
+                        <p className="text-center text-slate-500 text-xs mt-4">
+                            Secure authentication powered by Google
+                        </p>
                     </div>
-                    <p className="text-sm text-gray-500">
-                        © {new Date().getFullYear()} E-Rent Uganda. All rights reserved.
-                    </p>
                 </div>
+            </main>
+
+            {/* FOOTER */}
+            <footer className="py-4 text-center text-xs text-slate-500">
+                © {new Date().getFullYear()} E-Rent Uganda
             </footer>
         </div>
     );

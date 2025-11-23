@@ -1,4 +1,4 @@
-import { databases, uniqueId } from "./config";
+import { databases, uniqueId } from "../appwriteconfig/config";
 import type { Models } from "appwrite";
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
