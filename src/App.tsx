@@ -8,6 +8,7 @@ import LandingPage from "@pages/LandingPage";
 
 import ProtectedRoute from "@components/ProtectedRoute";
 import { Loader2 } from "lucide-react";
+import "./index.css";
 
 export function App() {
   const { fetchUser, user } = useAuthStore();
