@@ -6,21 +6,40 @@ import CreateRentalModal from "@/components/CreateRentalModal";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/UI/button";
 import { getRentals, createRental, type Rental } from "@appwriteconfig/db";
+import { syncUserWithDatabase } from "@/appwriteconfig/syncUser";
+
 
 const Dashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rentals, setRentals] = useState<Rental[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dbuserLoaded, setDbUserLoaded] = useState(false);
 
   useEffect(() => {
-    fetchRentals();
+    setupUser();
   }, []);
+  const setupUser = async () => {
+    try {
+      
+
+      // 2. Sync user to database (creates DB user if missing)
+      await syncUserWithDatabase();
+      console.log("User synced with database.");
+
+      // 3. Now DB user exists -> fetch rentals
+      setDbUserLoaded(true);
+      fetchRentals();
+    } catch (error) {
+      console.error("Error setting up user:", error);
+    }
+  };
 
   const fetchRentals = async () => {
     try {
       setLoading(true);
       const data = await getRentals();
       setRentals(data);
+      console.log("Fetched rentals:", data);
     } catch (error) {
       console.error("Failed to fetch rentals:", error);
     } finally {

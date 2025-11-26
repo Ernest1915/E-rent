@@ -1,4 +1,4 @@
-import { account, databases, uniqueId, Permission, Role, Query } from "../appwriteconfig/config";
+import { account, databases, uniqueId, Query } from "../appwriteconfig/config";
 import type { Models } from "appwrite";
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
@@ -7,20 +7,20 @@ const RENTAL_COLLECTION_ID = import.meta.env.VITE_APPWRITE_RENTAL_COLLECTION_ID;
 export interface Rental extends Models.Document {
     "unit-id": string;
     "unit-status": string;
-    ownerId: string; // new field
 }
 
-// ✅ Fetch only rentals created by the logged-in user
+/* -------------------------------------------------------
+   GET RENTALS (only rows the user can read)
+-------------------------------------------------------- */
 export const getRentals = async (): Promise<Rental[]> => {
     try {
         const user = await account.get();
 
-        const response: Models.DocumentList<Rental> = await databases.listDocuments<Rental>(
+
+        const response = await databases.listDocuments<Rental>(
             DATABASE_ID,
             RENTAL_COLLECTION_ID,
-            [
-                Query.equal("ownerId", user.$id) // row filter
-            ]
+            [Query.equal("users_id", user.$id)]
         );
 
         return response.documents;
@@ -30,13 +30,16 @@ export const getRentals = async (): Promise<Rental[]> => {
     }
 };
 
-// ✅ Create a rental with row permissions & ownerId
+/* -------------------------------------------------------
+   CREATE RENTAL (with proper row-level permissions)
+-------------------------------------------------------- */
 export const createRental = async (data: {
     unitId: string;
     unitStatus: string;
 }): Promise<Rental> => {
     try {
-        const user = await account.get();
+        
+         const user = await account.get();
 
         const response = await databases.createDocument<Rental>(
             DATABASE_ID,
@@ -45,14 +48,10 @@ export const createRental = async (data: {
             {
                 "unit-id": data.unitId,
                 "unit-status": data.unitStatus,
-                ownerId: user.$id,
+                "users_id": user.$id
             },
-            [
-                Permission.read(Role.user(user.$id)),
-                Permission.write(Role.user(user.$id)),
-                Permission.update(Role.user(user.$id)),
-                Permission.delete(Role.user(user.$id)),
-            ]
+            
+        
         );
 
         return response;
@@ -62,7 +61,9 @@ export const createRental = async (data: {
     }
 };
 
-// ✅ Delete rental (Appwrite will automatically block unauthorized users)
+/* -------------------------------------------------------
+   DELETE RENTAL (Appwrite handles permission checks)
+-------------------------------------------------------- */
 export const deleteRental = async (documentId: string): Promise<void> => {
     try {
         await databases.deleteDocument(
