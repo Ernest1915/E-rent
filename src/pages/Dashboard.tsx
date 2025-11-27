@@ -5,51 +5,37 @@ import RentalCard from "@/components/RentalCard";
 import CreateRentalModal from "@/components/CreateRentalModal";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/UI/button";
-import { getRentals, createRental, type Rental } from "@appwriteconfig/db";
 import { syncUserWithDatabase } from "@/appwriteconfig/syncUser";
+import { useRentals } from "@/hooks/useRentals";
+import { useCreateRental } from "@/hooks/useCreateRental";
 
 
 const Dashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [rentals, setRentals] = useState<Rental[]>([]);
-  const [loading, setLoading] = useState(true);
   const [dbuserLoaded, setDbUserLoaded] = useState(false);
+
+  // React Query hooks - automatic caching and refetching!
+  const { data: rentals = [], isLoading, error } = useRentals();
+  const createRentalMutation = useCreateRental();
 
   useEffect(() => {
     setupUser();
   }, []);
+
   const setupUser = async () => {
     try {
-      
-
-      // 2. Sync user to database (creates DB user if missing)
+      // Sync user to database (creates DB user if missing)
       await syncUserWithDatabase();
       console.log("User synced with database.");
-
-      // 3. Now DB user exists -> fetch rentals
       setDbUserLoaded(true);
-      fetchRentals();
     } catch (error) {
       console.error("Error setting up user:", error);
     }
   };
 
-  const fetchRentals = async () => {
-    try {
-      setLoading(true);
-      const data = await getRentals();
-      setRentals(data);
-      console.log("Fetched rentals:", data);
-    } catch (error) {
-      console.error("Failed to fetch rentals:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleCreateRental = async (newRental: { unitId: string; unitStatus: string }) => {
-    const rental = await createRental(newRental);
-    setRentals([rental, ...rentals]);
+    // Mutation automatically handles optimistic updates and cache invalidation
+    await createRentalMutation.mutateAsync(newRental);
   };
 
   return (
@@ -60,9 +46,13 @@ const Dashboard = () => {
         <Navbar onAddRental={() => setIsModalOpen(true)} />
 
         <main className="flex-1 p-6 overflow-y-auto">
-          {loading ? (
+          {isLoading ? (
             <div className="flex items-center justify-center h-[60vh]">
               <div className="text-gray-500">Loading rentals...</div>
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center h-[60vh]">
+              <div className="text-red-500">Failed to load rentals. Please try again.</div>
             </div>
           ) : rentals.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4">
