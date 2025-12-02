@@ -10,6 +10,15 @@
 
 export const queryKeys = {
     /**
+     * Property-related query keys
+     */
+    properties: {
+        all: ['properties'] as const,
+        byUser: (userId: string) => ['properties', 'user', userId] as const,
+        detail: (propertyId: string) => ['properties', 'detail', propertyId] as const,
+    },
+
+    /**
      * Rental-related query keys
      */
     rentals: {

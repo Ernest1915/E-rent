@@ -1,20 +1,27 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./UI/card";
 import { Home, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "./UI/button";
+import { useNavigate } from "react-router-dom";
 
 interface RentalCardProps {
+    rentalId: string;
     unitId: string;
     unitStatus: string;
-    onClick: () => void;
 }
 
-const RentalCard = ({ unitId, unitStatus, onClick }: RentalCardProps) => {
+const RentalCard = ({ rentalId, unitId, unitStatus }: RentalCardProps) => {
+    const navigate = useNavigate();
     const isVacant = unitStatus === "Vacant";
+
+    const handleManageClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        navigate(`/rental/${rentalId}`);
+    };
 
     return (
         <Card
             className="hover:shadow-md transition-shadow cursor-pointer group"
-            onClick={onClick}
+            onClick={handleManageClick}
         >
             <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
@@ -23,8 +30,8 @@ const RentalCard = ({ unitId, unitStatus, onClick }: RentalCardProps) => {
                         {unitId}
                     </CardTitle>
                     <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${isVacant
-                            ? "bg-green-50 text-green-700"
-                            : "bg-gray-100 text-gray-700"
+                        ? "bg-green-50 text-green-700"
+                        : "bg-gray-100 text-gray-700"
                         }`}>
                         {isVacant ? (
                             <CheckCircle className="h-3.5 w-3.5" />
@@ -37,7 +44,11 @@ const RentalCard = ({ unitId, unitStatus, onClick }: RentalCardProps) => {
             </CardHeader>
             <CardContent>
                 <div className="mt-4 pt-4 border-t border-gray-100">
-                    <Button variant="outline" className="w-full text-xs h-8">
+                    <Button
+                        variant="outline"
+                        className="w-full text-xs h-8"
+                        onClick={handleManageClick}
+                    >
                         Manage Unit
                     </Button>
                 </div>

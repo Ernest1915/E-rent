@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
-import RentalCard from "@/components/RentalCard";
-import CreateRentalModal from "@/components/CreateRentalModal";
+import PropertyCard from "@/components/PropertyCard";
+import CreatePropertyModal from "@/components/CreatePropertyModal";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/UI/button";
 import { syncUserWithDatabase } from "@/appwriteconfig/syncUser";
-import { useRentals } from "@/hooks/useRentals";
-import { useCreateRental } from "@/hooks/useCreateRental";
+import { useProperties } from "@/hooks/useProperties";
+import { useCreateProperty } from "@/hooks/useCreateProperty";
 
 
 const Dashboard = () => {
@@ -15,8 +15,8 @@ const Dashboard = () => {
   const [dbuserLoaded, setDbUserLoaded] = useState(false);
 
   // React Query hooks - automatic caching and refetching!
-  const { data: rentals = [], isLoading, error } = useRentals();
-  const createRentalMutation = useCreateRental();
+  const { data: properties = [], isLoading, error } = useProperties();
+  const createPropertyMutation = useCreateProperty();
 
   useEffect(() => {
     setupUser();
@@ -33,9 +33,9 @@ const Dashboard = () => {
     }
   };
 
-  const handleCreateRental = async (newRental: { unitId: string; unitStatus: string }) => {
+  const handleCreateProperty = async (newProperty: { property_name: string; location: string }) => {
     // Mutation automatically handles optimistic updates and cache invalidation
-    await createRentalMutation.mutateAsync(newRental);
+    await createPropertyMutation.mutateAsync(newProperty);
   };
 
   return (
@@ -43,38 +43,38 @@ const Dashboard = () => {
       <Sidebar />
 
       <div className="flex-1 flex flex-col">
-        <Navbar onAddRental={() => setIsModalOpen(true)} />
+        <Navbar onAddProperty={() => setIsModalOpen(true)} />
 
         <main className="flex-1 p-6 overflow-y-auto">
           {isLoading ? (
             <div className="flex items-center justify-center h-[60vh]">
-              <div className="text-gray-500">Loading rentals...</div>
+              <div className="text-gray-500">Loading properties...</div>
             </div>
           ) : error ? (
             <div className="flex items-center justify-center h-[60vh]">
-              <div className="text-red-500">Failed to load rentals. Please try again.</div>
+              <div className="text-red-500">Failed to load properties. Please try again.</div>
             </div>
-          ) : rentals.length === 0 ? (
+          ) : properties.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4">
               <div className="h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center">
                 <Plus className="h-8 w-8 text-gray-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">No rental units yet</h3>
+              <h3 className="text-lg font-semibold text-gray-900">No properties yet</h3>
               <p className="text-gray-500 max-w-sm">
-                Get started by creating your first rental unit to manage tenants and payments.
+                Get started by creating your first property to manage units, tenants and payments.
               </p>
               <Button onClick={() => setIsModalOpen(true)}>
-                Create First Unit
+                Create First Property
               </Button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {rentals.map((rental) => (
-                <RentalCard
-                  key={rental.$id}
-                  unitId={rental["unit-id"]}
-                  unitStatus={rental["unit-status"]}
-                  onClick={() => console.log("Clicked rental:", rental["unit-id"])}
+              {properties.map((property) => (
+                <PropertyCard
+                  key={property.$id}
+                  propertyId={property.$id}
+                  propertyName={property.property_name}
+                  location={property.location}
                 />
               ))}
             </div>
@@ -82,10 +82,10 @@ const Dashboard = () => {
         </main>
       </div>
 
-      <CreateRentalModal
+      <CreatePropertyModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onCreate={handleCreateRental}
+        onCreate={handleCreateProperty}
       />
     </div>
   );

@@ -3,10 +3,10 @@ import { Button } from "./UI/button";
 import { useAuthStore } from "@store/authStore";
 
 interface NavbarProps {
-    onAddRental: () => void;
+    onAddProperty: () => void;
 }
 
-const Navbar = ({ onAddRental }: NavbarProps) => {
+const Navbar = ({ onAddProperty }: NavbarProps) => {
     const { user } = useAuthStore();
 
     return (
@@ -17,11 +17,11 @@ const Navbar = ({ onAddRental }: NavbarProps) => {
             </div>
 
             <div className="flex items-center gap-4">
-                <Button onClick={onAddRental} size="sm" className="hidden sm:flex">
+                <Button onClick={onAddProperty} size="sm" className="hidden sm:flex">
                     <Plus className="mr-2 h-4 w-4" />
-                    Add Rental
+                    Add Property
                 </Button>
-                <Button onClick={onAddRental} size="icon" className="sm:hidden">
+                <Button onClick={onAddProperty} size="icon" className="sm:hidden">
                     <Plus className="h-4 w-4" />
                 </Button>
 

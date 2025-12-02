@@ -8,6 +8,7 @@ import { queryClient } from "@/lib/queryClient";
 import AdminLogin from "@components/LoginPage";
 import Dashboard from "@pages/Dashboard";
 import LandingPage from "@pages/LandingPage";
+import RentalDetails from "@pages/RentalDetails";
 
 import ProtectedRoute from "@components/ProtectedRoute";
 import { Loader2 } from "lucide-react";
@@ -59,6 +60,10 @@ export function App() {
             <Route
               path="/dashboard"
               element={<Dashboard />}
+            />
+            <Route
+              path="/rental/:rentalId"
+              element={<RentalDetails />}
             />
           </Route>
 
