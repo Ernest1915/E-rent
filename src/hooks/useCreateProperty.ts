@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createProperties, type Property } from '@appwriteconfig/db';
+import { createProperties } from '@appwriteconfig/db';
+import type { Property } from '@appwriteconfig/index';
 import { queryKeys } from '@/lib/queryKeys';
 import { useAuthStore } from '@store/authStore';
 
@@ -41,7 +42,7 @@ export function useCreateProperty() {
                         $id: `temp-${Date.now()}`,
                         'property_name': newProperty.property_name,
                         'location': newProperty.location,
-                        'users_id': user?.$id || '',
+                        'users': user?.$id || '',
                         $createdAt: new Date().toISOString(),
                         $updatedAt: new Date().toISOString(),
                         $permissions: [],
@@ -58,7 +59,12 @@ export function useCreateProperty() {
 
         // ROLLBACK: Restore previous state if mutation fails
         onError: (err, _variables, context) => {
-            console.error('Failed to create property:', err);
+            console.error('❌ Property creation FAILED:', err);
+            console.error('Error details:', {
+                message: err?.message,
+                name: err?.name,
+                stack: err?.stack
+            });
 
             if (context?.previousProperties) {
                 queryClient.setQueryData(
@@ -68,11 +74,19 @@ export function useCreateProperty() {
             }
         },
 
-        // SYNC: Refetch to get the real data from server
-        onSettled: () => {
+        // SYNC: Refetch to get the real data from server (only on success)
+        onSuccess: (data) => {
+            console.log('✅ Property created successfully:', data);
+            console.log('Invalidating cache to refresh...');
+
             queryClient.invalidateQueries({
                 queryKey: queryKeys.properties.byUser(user?.$id || '')
             });
         },
+
+        // SETTLED: Called after either success or error
+        onSettled: () => {
+            console.log('🏁 Mutation settled (completed)');
+        }
     });
 }

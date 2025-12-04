@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Dialog } from "./UI/dialog";
 import { Button } from "./UI/button";
 import { Input } from "./UI/input";
@@ -18,20 +18,51 @@ const CreatePropertyModal = ({ isOpen, onClose, onCreate }: CreatePropertyModalP
         location: "",
     });
 
+    // Track in-flight requests to prevent React StrictMode duplicates
+    const isSubmittingRef = useRef(false);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Prevent duplicate submissions (including StrictMode double-calls)
+        if (loading || isSubmittingRef.current) {
+            console.log("Submission blocked - already in progress");
+            return;
+        }
+
+        isSubmittingRef.current = true;
         setLoading(true);
+
         try {
+            console.log("📝 CreatePropertyModal: Submitting property creation...");
             await onCreate({
                 property_name: formData.property_name,
                 location: formData.location,
             });
+
+            console.log("✅ CreatePropertyModal: Property created successfully!");
             setFormData({ property_name: "", location: "" }); // Reset form
             onClose();
-        } catch (error) {
-            console.error("Failed to create property", error);
+        } catch (error: any) {
+            console.error("❌ CreatePropertyModal: Error in handleSubmit", error);
+            console.error("Error type:", typeof error);
+            console.error("Error object:", error);
+
+            // Show user-friendly error for duplicates
+            if (error?.message?.includes("already exists")) {
+                alert(`Property "${formData.property_name}" already exists. Please use a different name.`);
+            } else {
+                // Log detailed error information for debugging
+                console.error("Non-duplicate error:", {
+                    message: error?.message,
+                    name: error?.name,
+                    cause: error?.cause,
+                });
+                alert("Failed to create property. Please try again.");
+            }
         } finally {
             setLoading(false);
+            isSubmittingRef.current = false;
         }
     };
 

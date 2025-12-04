@@ -34,8 +34,16 @@ const Dashboard = () => {
   };
 
   const handleCreateProperty = async (newProperty: { property_name: string; location: string }) => {
-    // Mutation automatically handles optimistic updates and cache invalidation
-    await createPropertyMutation.mutateAsync(newProperty);
+    try {
+      console.log('🚀 Starting property creation:', newProperty);
+      // Mutation automatically handles optimistic updates and cache invalidation
+      const result = await createPropertyMutation.mutateAsync(newProperty);
+      console.log('✅ Property creation returned successfully:', result);
+    } catch (error) {
+      console.error('❌ Error caught in handleCreateProperty:', error);
+      // Re-throw so CreatePropertyModal can handle it
+      throw error;
+    }
   };
 
   return (

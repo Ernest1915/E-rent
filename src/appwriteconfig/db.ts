@@ -1,7 +1,7 @@
 
-import { account, databases, uniqueId, Query } from "../appwriteconfig/config";
+import { account, databases, uniqueId, Query, Permission, Role } from "../appwriteconfig/config";
 import type { Rental, Property, UnitType, Tenant, Payment } from "../appwriteconfig/index";
-export type { Rental, Property, UnitType, Tenant, Payment };
+
 
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 const RENTAL_COLLECTION_ID = import.meta.env.VITE_APPWRITE_RENTAL_COLLECTION_ID;
@@ -27,7 +27,7 @@ export const getRentals = async (): Promise<Rental[]> => {
         const response = await databases.listDocuments<Rental>(
             DATABASE_ID,
             RENTAL_COLLECTION_ID,
-            [Query.equal("users_id", user.$id)]
+            [Query.equal("users", user.$id)]
         );
 
         return response.documents;
@@ -56,7 +56,7 @@ export const createRental = async (data: {
             {
                 "unit-id": data.unitId,           // Appwrite field
                 "unit-status": data.unitStatus,   // Appwrite field
-                "users_id": user.$id,             // linked user ID
+                "users": user.$id,             // linked user ID
                 "type_id": data.typeId,          // link to unit type
                 "tenant_id": data.tenant_id
             }
@@ -91,29 +91,46 @@ export const createProperties = async (data: {
 }): Promise<Property> => {
     try {
         const user = await account.get();
+        console.log("Current user:", user);
+        console.log("Creating property with data:", {
+            property_name: data.property_name,
+            location: data.location,
+            users: user.$id
+        });
+        console.log("Database ID:", DATABASE_ID);
+        console.log("Properties Collection ID:", PROPERTIES_COLLECTION_ID);
+
         const response = await databases.createDocument<Property>(
             DATABASE_ID,
             PROPERTIES_COLLECTION_ID,
-            uniqueId.unique(), // document ID
+            uniqueId.unique(),
             {
                 "property_name": data.property_name,
                 "location": data.location,
-                "users_id": user.$id,
+                "users": user.$id,
             }
         );
+        console.log("Property created successfully:", response);
         return response;
     } catch (error) {
         console.error("Failed to create property:", error);
+        console.error("Error details:", JSON.stringify(error, null, 2));
         throw error;
     }
 };
 export const getProperties = async (): Promise<Property[]> => {
     try {
         const user = await account.get();
+
+        console.log("DEBUG: Fetching properties...");
+        console.log("DEBUG: Database ID:", DATABASE_ID);
+        console.log("DEBUG: Collection ID:", PROPERTIES_COLLECTION_ID);
+        console.log("DEBUG: User ID:", user.$id);
+
         const response = await databases.listDocuments<Property>(
             DATABASE_ID,
             PROPERTIES_COLLECTION_ID,
-            [Query.equal("users_id", user.$id)]
+            [Query.equal("users", user.$id)]
         );
 
         return response.documents;

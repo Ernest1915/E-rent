@@ -7,7 +7,8 @@ import {
   ID,
   Permission,
   Role,
-  Query
+  Query,
+  
 } from "appwrite";
 
 const client = new Client()

@@ -3,14 +3,14 @@ import type { Models } from "appwrite";
 export interface Rental extends Models.Document {
     "unit-id": string;
     "unit-status": string;
-    "users_id": string;
+    "users": string;
     "type_id": string;
     "tenant_id": string;
 }
 export interface Property extends Models.Document {
     "property_name": string;
     "location": string;
-    "users_id": string;
+    "users": string;
 }
 export interface UnitType extends Models.Document {
     "name": string;
